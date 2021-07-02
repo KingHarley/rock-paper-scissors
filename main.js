@@ -1,3 +1,13 @@
+const outputText = document.querySelector("#text");
+const playerScoreText = document.querySelector("#player-score");
+const computerScoreText = document.querySelector("#computer-score");
+const btns = document.querySelectorAll("button");
+
+let playerScore = 0;
+let computerScore = 0;
+
+
+
 function computerPlay()
 {
     let variable = Math.floor((Math.random()*10)%3);
@@ -48,49 +58,78 @@ function playRound(computerSelection, playerSelection)
     return result;
 }
 
-function game()
+function resetGame()
 {
-    let playerScore = 0;
-    let computerScore = 0;
-    for (let i = 0; i < 5; i++)
-    {
-        let userInput = prompt("Rock, paper, or scissors?");
-        let result = playRound(computerPlay(), userInput);
+    playerScore = 0;
+    computerScore = 0;
 
-        switch(result)
+    outputText.textContent = "New Game!";
+    playerScoreText.textContent = `Player: ${0}`;
+    computerScoreText.textContent = `Computer: ${0}`;
+    btns.forEach((button) => {
+        button.removeAttribute("disabled");
+    })
+}
+
+function game(userInput)
+{
+    let result = playRound(computerPlay(), userInput);
+
+    switch(result)
+    {
+        case(1):
+            playerScoreText.textContent = `Player: ${++playerScore}`;
+            outputText.textContent = "Round won!";
+            break;
+        case(0):
+            outputText.textContent ="Round draw!";
+            break;
+        case(-1):
+            computerScoreText.textContent = `Computer: ${++computerScore}`;    
+            outputText.textContent = "Round lost!";
+            break;
+        default:
+            outputText.textContent = "Incorrect input";
+    }
+    
+    console.log(`Player: ${playerScore} vs Computer: ${computerScore}`);
+
+    if (playerScore >= 5 || computerScore >= 5)
+    {
+        if(playerScore >= 5)
         {
-            case(1):
-                playerScore++;
-                console.log("Round won!");
-                break;
-            case(0):
-                console.log("Round draw!");
-                break;
-            case(-1):
-                computerScore++;
-                console.log("Round lost!");
-                break;
-            default:
-                console.log("Incorrect input");
+            outputText.textContent = "Congrats you won the match!";
         }
-
-        console.log(`Player: ${playerScore} vs Computer: ${computerScore}`);
-    }
-
-    if (playerScore > computerScore)
-    {
-        console.log("Congrats you won the match!");
-    }
-    else if (playerScore < computerScore)
-    {
-        console.log("You lost the match!");
-    }
-    else
-    {
-        console.log("The match was a draw!");
+        else
+        {
+            outputText.textContent = "You lost the match!";
+        }
+        gameOver();
     }
 }
 
-const playerSelection = "rock";
-const computerSelection = "rock";
-console.log(playRound(computerSelection, playerSelection));
+function gameOver()
+{
+    btns.forEach((button) => {
+        button.setAttribute("disabled", "true");
+    })
+    const divButtons = document.querySelector("#buttons");
+    const resetButton = document.createElement("button");
+    resetButton.textContent = "Reset";
+    resetButton.addEventListener("click", (event) => {
+        divButtons.removeChild(resetButton);
+        resetGame();  
+    })
+
+    divButtons.appendChild(resetButton);
+    console.log(divButtons);
+    console.log(resetButton);
+}
+
+btns.forEach((button) => {
+    button.addEventListener("click", (event) => {
+        game(event.target.id);
+    })
+})
+
+resetGame();
